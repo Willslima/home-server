@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple File Transfer</title>
+    <!-- Tailwind CSS CDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/client.css"> 
+</head>
+<body>
+    <div class="container space-y-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800">File Transfer Hub</h1>
+
+        <!-- Upload Section -->
+        <div class="p-6 border border-gray-200 rounded-xl shadow-sm">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Upload File</h2>
+            <input type="file" id="fileInput" class="input-file mb-4">
+            <button id="uploadButton" class="btn w-full">Upload File</button>
+            <p id="uploadStatus" class="mt-4 text-center text-sm text-gray-600"></p>
+        </div>
+
+        <!-- Download Section -->
+        <div class="p-6 border border-gray-200 rounded-xl shadow-sm">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Available Files</h2>
+            <div id="fileList" class="space-y-3">
+                <p class="text-center text-gray-500">No files uploaded yet.</p>
+                <!-- Files will be listed here -->
+            </div>
+            <button id="refreshButton" class="btn w-full mt-6">Refresh File List</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import('./client.js')
+            .then(module => {
+                console.log('client.js loaded successfully!');
+                if (module.sayHello) {
+                    module.sayHello(); // Call a function from client.js if it exists
+                }
+            })
+            .catch(error => {
+                console.error('Error loading client.js:', error);
+            });
+    </script>
+
+   </body>
+</html>

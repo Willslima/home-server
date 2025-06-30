@@ -1,0 +1,52 @@
+/* public/style.css */
+
+/* Custom styles for better aesthetics */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.container {
+    background-color: #ffffff;
+    border-radius: 1rem; /* Rounded corners */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 600px;
+}
+.btn {
+    /* These @apply directives require Tailwind CSS build process */
+    @apply px-6 py-3 rounded-lg font-semibold text-white transition duration-200 ease-in-out;
+    background-image: linear-gradient(to right, #6366f1, #8b5cf6); /* Purple gradient */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.btn:hover {
+    background-image: linear-gradient(to right, #4f46e5, #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+.input-file {
+    /* These @apply directives require Tailwind CSS build process */
+    @apply block w-full text-sm text-gray-500
+                   file:mr-4 file:py-2 file:px-4
+                   file:rounded-full file:border-0
+                   file:text-sm file:font-semibold
+                   file:bg-violet-50 file:text-violet-700
+                   hover:file:bg-violet-100;
+}
+.file-item {
+    /* These @apply directives require Tailwind CSS build process */
+    @apply flex justify-between items-center bg-gray-100 p-3 mb-2 rounded-lg;
+}
+.delete-btn {
+    /* These @apply directives require Tailwind CSS build process */
+    @apply bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-md text-sm transition duration-150 ease-in-out;
+}
+.action-buttons {
+    /* These @apply directives require Tailwind CSS build process */
+    @apply flex space-x-2; /* To space out Download and Delete buttons */
+}

@@ -1,12 +1,25 @@
 // server.js
-// This script sets up a simple HTTP server using Node.js to handle file uploads, downloads, and deletions.
 
-const http = require('http'); // Node.js HTTP module for creating web servers
-const formidable = require('formidable'); // Module for parsing form data, especially file uploads
-const fs = require('fs'); // Node.js File System module for interacting with the file system
-const path = require('path'); // Node.js Path module for handling file paths
+const http = require('http');
+const formidable = require('formidable');
+const fs = require('fs');
+const path = require('path');
 
 const UPLOAD_DIR = path.join(__dirname, 'uploads'); // Directory where uploaded files will be stored
+const PUBLIC_DIR = path.join(__dirname, 'public'); // Directory for your static client-side files
+
+const mimeTypes = {
+    '.html': 'text/html',
+    '.js': 'application/javascript', // Crucial for client.js
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+    '.ico': 'image/x-icon',
+    // Add other MIME types as needed for your static files
+};
 
 // Ensure the upload directory exists. If not, create it.
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -14,6 +27,8 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 }
 
 console.log(`Upload directory: ${UPLOAD_DIR}`);
+console.log(`Public directory (for static files): ${PUBLIC_DIR}`);
+
 
 // Create the HTTP server
 const server = http.createServer((req, res) => {
@@ -117,7 +132,7 @@ const server = http.createServer((req, res) => {
             }
 
             res.writeHead(200, {
-                'Content-Type': 'application/octet-stream',
+                'Content-Type': 'application/octet-stream', // Generic binary for download
                 'Content-Disposition': `attachment; filename="${fileName}"`
             });
 
@@ -158,20 +173,36 @@ const server = http.createServer((req, res) => {
         });
     }
 
-    // --- Serve the static HTML client (GET / or anything else by default) ---
+    // --- Serve Static Files (HTML, JS, CSS, Images, etc.) ---
     else {
-        console.log(`[SERVER] Routing: Fallback - Serving client.html for ${req.method} ${req.url}.`);
-        const clientPath = path.join(__dirname, 'client.html');
+        // Determine the requested file path. If it's root '/', serve index.html.
+        let requestedPath = req.url === '/' ? '/client.html' : req.url;
+        let filePath = path.join(PUBLIC_DIR, requestedPath);
 
-        fs.readFile(clientPath, (err, data) => {
-            if (err) {
-                console.error('[SERVER] Error reading client.html in fallback:', err);
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
-                res.end('Internal Server Error: Could not load client page.');
-                return;
+        // Get the file extension to determine the MIME type
+        const extname = String(path.extname(filePath)).toLowerCase();
+        const contentType = mimeTypes[extname] || 'application/octet-stream'; // Default to binary stream
+
+        console.log(`[SERVER] Routing: Serving static file: ${filePath} with type ${contentType}`);
+
+        fs.readFile(filePath, (error, content) => {
+            if (error) {
+                if (error.code === 'ENOENT') {
+                    // File not found (e.g., /nonexistent.js)
+                    console.error(`[SERVER] Static file not found: ${filePath}`);
+                    res.writeHead(404, { 'Content-Type': 'text/html' }); // Send HTML 404
+                    res.end('<h1>404 Not Found</h1><p>The requested file could not be found.</p>');
+                } else {
+                    // Server error (e.g., permissions)
+                    console.error(`[SERVER] Error reading static file ${filePath}:`, error);
+                    res.writeHead(500);
+                    res.end('<h1>500 Internal Server Error: ' + error.code + '</h1>');
+                }
+            } else {
+                // Success: set correct content type and send the file
+                res.writeHead(200, { 'Content-Type': contentType });
+                res.end(content, 'utf-8');
             }
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(data);
         });
     }
 });
